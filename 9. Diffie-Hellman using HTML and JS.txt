@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Diffie-Hellman Key Exchange</title>
+    <style>
+        body { font-family: Arial; margin: 40px; }
+        input { margin: 5px; padding: 5px; }
+        button { padding: 8px; margin-top: 10px; }
+        #result { margin-top: 20px; padding: 10px; border: 1px solid #333; }
+    </style>
+</head>
+<body>
+
+<h2>Diffie-Hellman Key Exchange</h2>
+
+<label>Prime number (p):</label><br>
+<input type="number" id="p"><br>
+
+<label>Primitive root (g):</label><br>
+<input type="number" id="g"><br>
+
+<label>Alice private key (a):</label><br>
+<input type="number" id="a"><br>
+
+<label>Bob private key (b):</label><br>
+<input type="number" id="b"><br>
+
+<button onclick="computeDH()">Compute Keys</button>
+
+<div id="result"></div>
+
+<script>
+function modPow(base, exp, mod) {
+    let result = 1;
+    base = base % mod;
+    while (exp > 0) {
+        if (exp % 2 === 1) result = (result * base) % mod;
+        exp = Math.floor(exp / 2);
+        base = (base * base) % mod;
+    }
+    return result;
+}
+
+function computeDH() {
+    let p = parseInt(document.getElementById("p").value);
+    let g = parseInt(document.getElementById("g").value);
+    let a = parseInt(document.getElementById("a").value);
+    let b = parseInt(document.getElementById("b").value);
+
+    if (!p || !g || !a || !b) {
+        alert("Please enter all values!");
+        return;
+    }
+
+    // Public keys
+    let A = modPow(g, a, p);  
+    let B = modPow(g, b, p);
+
+    // Shared secrets
+    let secretA = modPow(B, a, p);  
+    let secretB = modPow(A, b, p);
+
+    document.getElementById("result").innerHTML =
+        "<b>Alice Public Key (A):</b> " + A + "<br>" +
+        "<b>Bob Public Key (B):</b> " + B + "<br><br>" +
+        "<b>Shared Secret at Alice:</b> " + secretA + "<br>" +
+        "<b>Shared Secret at Bob:</b> " + secretB + "<br><br>" +
+        "<b>Keys Match?</b> " + (secretA === secretB ? "✔ YES" : "❌ NO");
+}
+</script>
+
+</body>
+</html>
+
+
+Sample Input
+
+Suppose you enter:
+
+p = 23
+
+g = 5
+
+Alice private key (a) = 6
+
+Bob private key (b) = 15

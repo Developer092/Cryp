@@ -1,0 +1,31 @@
+import java.security.MessageDigest;
+import java.util.Scanner;
+import java.util.Base64;
+
+public class MD5Digest {
+
+    public static void main(String[] args) throws Exception {
+
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter text: ");
+        String text = sc.nextLine();
+
+        // Create MD5 MessageDigest object
+        MessageDigest md = MessageDigest.getInstance("MD5");
+
+        // Compute digest
+        byte[] hashBytes = md.digest(text.getBytes());
+
+        // Convert to Hex String
+        StringBuilder hex = new StringBuilder();
+        for (byte b : hashBytes) {
+            hex.append(String.format("%02x", b));
+        }
+
+        // Also show Base64 version (optional)
+        String base64 = Base64.getEncoder().encodeToString(hashBytes);
+
+        System.out.println("\nMD5 Digest (Hex): " + hex);
+        System.out.println("MD5 Digest (Base64): " + base64);
+    }
+}

@@ -1,0 +1,76 @@
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Base64;
+import java.util.Scanner;
+
+public class CryptoCombinedUser {
+
+    private static String encrypt(String algo, SecretKey key, String text) throws Exception {
+        Cipher cipher = Cipher.getInstance(algo);
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        return Base64.getEncoder().encodeToString(cipher.doFinal(text.getBytes()));
+    }
+
+    private static String decrypt(String algo, SecretKey key, String enc) throws Exception {
+        Cipher cipher = Cipher.getInstance(algo);
+        cipher.init(Cipher.DECRYPT_MODE, key);
+        return new String(cipher.doFinal(Base64.getDecoder().decode(enc)));
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        Scanner sc = new Scanner(System.in);
+
+        // === RC4 INPUT ===
+        System.out.println("=== RC4 Encryption/Decryption ===");
+        System.out.print("Enter RC4 key: ");
+        String rc4KeyStr = sc.nextLine();
+
+        System.out.print("Enter RC4 plaintext: ");
+        String rc4Text = sc.nextLine();
+
+        SecretKey rc4Key = new SecretKeySpec(rc4KeyStr.getBytes(), "ARCFOUR");
+
+        String rc4Enc = encrypt("ARCFOUR", rc4Key, rc4Text);
+        String rc4Dec = decrypt("ARCFOUR", rc4Key, rc4Enc);
+
+        System.out.println("RC4 Encrypted (Base64): " + rc4Enc);
+        System.out.println("RC4 Decrypted: " + rc4Dec);
+        System.out.println();
+
+
+        // === BLOWFISH INPUT ===
+        System.out.println("=== Blowfish Encryption/Decryption ===");
+        System.out.print("Enter Blowfish key file name: ");
+        String fileName = sc.nextLine();
+
+        byte[] keyBytes = Files.readAllBytes(Paths.get(fileName));
+        SecretKey blowKey = new SecretKeySpec(keyBytes, "Blowfish");
+
+        System.out.print("Enter Blowfish plaintext: ");
+        String bfText = sc.nextLine();
+
+        String bfEnc = encrypt("Blowfish", blowKey, bfText);
+        String bfDec = decrypt("Blowfish", blowKey, bfEnc);
+
+        System.out.println("Blowfish Encrypted (Base64): " + bfEnc);
+        System.out.println("Blowfish Decrypted: " + bfDec);
+    }
+}
+
+
+
+
+Next step for blowfish key:
+
+keytool -genseckey -alias myblowfishkey -keyalg Blowfish -keysize 128 -keystore mykeys.jceks -storetype JCEKS
+
+
+Export key:
+keytool -keystore mykeys.jceks -storetype JCEKS \
+        -exportcert -alias myblowfishkey -rfc -file myblowfish.key
+
+Place myblowfish.key in the same folder as your Java program.
